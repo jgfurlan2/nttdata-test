@@ -69,8 +69,8 @@ public class OrdersService {
         Client client = order.getClient();
         if (client == null) {
             throw new InvalidClientException("Missing client");
-        } else if (client.getId() == null) {
-            throw new InvalidClientException("Missing client id");
+        } else if (client.getId() == null || client.getId() <= 0) {
+            throw new InvalidClientException("Missing or invalid client id");
         } else if (Strings.isNullOrEmpty(client.getName())) {
             throw new InvalidClientException("Null or empty client name");
         } else if (Strings.isNullOrEmpty(client.getTaxId())) {
@@ -96,21 +96,25 @@ public class OrdersService {
             throw new InvalidClientAddressException("Missing client address country");
         }
 
-        for (int i = 0; i < order.getProducts().size() - 1; i++) {
-            Product product = order.getProducts().get(i);
+        if (order.getProducts() == null || order.getProducts().isEmpty()) {
+            throw new InvalidProductException("Products list is null or empty");
+        } else {
+            for (int i = 0; i < order.getProducts().size() - 1; i++) {
+                Product product = order.getProducts().get(i);
 
-            if (product == null) {
-                throw new InvalidProductException("Product " + (i + 1) + " is null");
-            } else if (product.getId() == null) {
-                throw new InvalidProductException("Product " + (i + 1) + " missing id");
-            } else if (Strings.isNullOrEmpty(product.getGs1())) {
-                throw new InvalidProductException("Product " + (i + 1) + " missing GS1 code");
-            } else if (Strings.isNullOrEmpty(product.getName())) {
-                throw new InvalidProductException("Product " + (i + 1) + " missing name");
-            } else if (product.getQuantity() == null || product.getQuantity() <= 0) {
-                throw new InvalidProductException("Product " + (i + 1) + " missing or invalid quantity");
-            } else if (product.getPrice() == null || product.getPrice() <= 0) {
-                throw new InvalidProductException("Product " + (i + 1) + " missing or invalid price");
+                if (product == null) {
+                    throw new InvalidProductException("Product " + (i + 1) + " is null");
+                } else if (product.getId() == null || product.getId() <= 0) {
+                    throw new InvalidProductException("Product " + (i + 1) + " missing id");
+                } else if (Strings.isNullOrEmpty(product.getGs1())) {
+                    throw new InvalidProductException("Product " + (i + 1) + " missing GS1 code");
+                } else if (Strings.isNullOrEmpty(product.getName())) {
+                    throw new InvalidProductException("Product " + (i + 1) + " missing name");
+                } else if (product.getQuantity() == null || product.getQuantity() <= 0) {
+                    throw new InvalidProductException("Product " + (i + 1) + " missing or invalid quantity");
+                } else if (product.getPrice() == null || product.getPrice() <= 0) {
+                    throw new InvalidProductException("Product " + (i + 1) + " missing or invalid price");
+                }
             }
         }
 
